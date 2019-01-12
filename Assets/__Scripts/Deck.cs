@@ -39,7 +39,7 @@ public class Deck : MonoBehaviour {
 		dictSuits = new Dictionary<string, Sprite> () {
 			{ "C", suitClub },
 			{ "D", suitDiamond },
-			{ "E", suitHeart },
+			{ "H", suitHeart },
 			{ "S", suitSpade }
 		};
 
