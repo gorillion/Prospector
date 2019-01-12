@@ -4,6 +4,23 @@ using UnityEngine;
 
 public class Deck : MonoBehaviour {
 
+	[Header ("Set In Inspector")]
+	public Sprite suitClub;
+	public Sprite suitDiamond;
+	public Sprite suitHeart;
+	public Sprite suitSpade;
+
+	public Sprite[] faceSprites;
+	public Sprite[] rankSprites;
+
+	public Sprite cardBack;
+	public Sprite cardBackGold;
+	public Sprite cardFront;
+	public Sprite cardFrontGold;
+
+	public GameObject prefabCard;
+	public GameObject prefabSprite;
+
 	[Header ("Set Dynamically")]
 	public PT_XMLReader xmlr;
 	public List<string> cardNames;
@@ -14,7 +31,21 @@ public class Deck : MonoBehaviour {
 	public Dictionary<string, Sprite> dictSuits;
 
 	public void InitDeck(string deckXMLText) {
+		if (GameObject.Find ("_Deck") == null) {
+			GameObject anchorGO = new GameObject ("_Deck");
+			deckAnchor = anchorGO.transform;
+		}
+
+		dictSuits = new Dictionary<string, Sprite> () {
+			{ "C", suitClub },
+			{ "D", suitDiamond },
+			{ "E", suitHeart },
+			{ "S", suitSpade }
+		};
+
 		ReadDeck (deckXMLText);
+
+		MakeCards();
 	}
 
 	public void ReadDeck(string deckXMLText) {
@@ -65,6 +96,64 @@ public class Deck : MonoBehaviour {
 				cDef.face = xCardDefs[i].att ("face");
 			}
 			cardDefs.Add (cDef);
+		}
+	}
+
+	public CardDefinition GetCardDefinitionByRank(int rnk) {
+		foreach (CardDefinition cd in cardDefs) {
+			if (cd.rank == rnk)
+				return (cd);
+		}
+		return (null);
+	}
+
+	public void MakeCards () {
+		cardNames = new List<string> ();
+		string[] letters = new string[] { "C", "D", "H", "S" };
+		foreach (string s in letters) {
+			for (int i=0; i<13; i++) {
+				cardNames.Add (s + (i + 1));
+			}
+		}
+		cards = new List<Card> ();
+		
+		for (int i=0; i<cardNames.Count; i++) {
+			cards.Add (MakeCard (i));
+		}
+	}
+
+	public Card MakeCard(int cNum) {
+		GameObject cgo = Instantiate (prefabCard) as GameObject;
+		cgo.transform.parent = deckAnchor;
+		Card card = cgo.GetComponent<Card> ();
+		cgo.transform.localPosition = new Vector3 ((cNum % 13) * 3, cNum / 13 * 4, 0);
+
+		card.name = cardNames[cNum];
+		card.suit = card.name[0].ToString ();
+		card.rank = int.Parse (card.name.Substring (1));
+		if(card.suit == "D"|| card.suit == "H") {
+			card.colS = "Red";
+			card.color = Color.red;
+		}
+		card.def = GetCardDefinitionByRank (card.rank);
+		AddDecorators (card);
+		return card;
+	}
+
+	private Sprite _tSp = null;
+	private GameObject _tGO = null;
+	private SpriteRenderer _tSR = null;
+
+	private void AddDecorators(Card card) {
+		foreach(Decorator deco in decorators) {
+			if(deco.type == "Suit") {
+				_tGO = Instantiate (prefabSprite) as GameObject;
+				_tSR = _tGO.GetComponent<SpriteRenderer> ();
+				_tSR.sprite = dictSuits[card.suit];
+			}
+			else {
+				//_tGO = Instantiate
+			}
 		}
 	}
 
