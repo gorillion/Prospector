@@ -137,6 +137,8 @@ public class Deck : MonoBehaviour {
 		}
 		card.def = GetCardDefinitionByRank (card.rank);
 		AddDecorators (card);
+		AddPips (card);
+		AddFace (card);
 		return card;
 	}
 
@@ -152,10 +154,70 @@ public class Deck : MonoBehaviour {
 				_tSR.sprite = dictSuits[card.suit];
 			}
 			else {
-				//_tGO = Instantiate
+				_tGO = Instantiate (prefabSprite) as GameObject;
+				_tSR = _tGO.GetComponent<SpriteRenderer> ();
+				_tSp = rankSprites[card.rank];
+				_tSR.sprite = _tSp;
+				_tSR.color = card.color;
 			}
+			_tSR.sortingOrder = 1;
+			_tGO.transform.SetParent (card.transform);
+			_tGO.transform.localPosition = deco.loc;
+			if (deco.flip)
+			{
+				_tGO.transform.rotation = Quaternion.Euler (0, 0, 180);
+			}
+			if (deco.scale != 1)
+			{
+				_tGO.transform.localScale = Vector3.one * deco.scale;
+			}
+			_tGO.name = deco.type;
+			card.decoGOs.Add (_tGO);
 		}
 	}
+
+	private void AddPips (Card card) {
+		foreach(Decorator pip in card.def.pips) {
+			_tGO = Instantiate (prefabSprite) as GameObject;
+			_tGO.transform.SetParent (card.transform);
+			_tGO.transform.localPosition = pip.loc;
+			if (pip.flip) {
+				_tGO.transform.rotation = Quaternion.Euler (0, 0, 180);
+			}
+			if(pip.scale != 1) {
+				_tGO.transform.localScale = Vector3.one * pip.scale;
+			}
+			_tGO.name = "pip";
+			_tSR = _tGO.GetComponent<SpriteRenderer> ();
+			_tSR.sprite = dictSuits[card.suit];
+			_tSR.sortingOrder = 1;
+			card.pipGOs.Add (_tGO);
+		}
+	}
+
+	private void AddFace (Card card) {
+		if(card.def.face == "") {
+			return;
+		}
+		_tGO = Instantiate (prefabSprite) as GameObject;
+		_tSR = _tGO.GetComponent<SpriteRenderer> ();
+		_tSp = GetFace (card.def.face + card.suit);
+		_tSR.sprite = _tSp;
+		_tSR.sortingOrder = 1;
+		_tGO.transform.SetParent (card.transform);
+		_tGO.transform.localPosition = Vector3.zero;
+		_tGO.name = "face";
+	}
+
+	private Sprite GetFace(string faceS) {
+		foreach(Sprite _tSP in faceSprites) {
+			if(_tSP.name == faceS) {
+				return (_tSP);
+			}
+		}
+		return null;
+	}
+
 
     void Start() {
         
