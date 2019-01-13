@@ -69,20 +69,57 @@ public class Prospector : MonoBehaviour {
 
 		CardProspector cp;
 
+		print (layout.slotDefs.Count);
+
 		foreach (SlotDef tSD in layout.slotDefs) {
-			cp = Draw ();
-			cp.faceUp = tSD.faceUp;
-			cp.transform.parent = layoutAnchor;
-			cp.transform.localPosition = new Vector3 (layout.multiplier.x * tSD.x, layout.multiplier.y * tSD.y, - tSD.layerID);
-			cp.layoutID = tSD.id;
-			cp.slotDef = tSD;
-			cp.state = eCardState.tableau;
-			cp.SetSortingLayerName (tSD.layerName);
 
-			tableau.Add (cp);
+			if (drawPile.Count > 0) {
 
-			MoveToTarget (Draw ());
-			UpdateDrawPile ();
+				cp = Draw ();
+				cp.faceUp = tSD.faceUp;
+				cp.transform.parent = layoutAnchor;
+				cp.transform.localPosition = new Vector3 (layout.multiplier.x * tSD.x, layout.multiplier.y * tSD.y, -tSD.layerID);
+				cp.layoutID = tSD.id;
+				cp.slotDef = tSD;
+				cp.state = eCardState.tableau;
+				cp.SetSortingLayerName (tSD.layerName);
+
+				tableau.Add (cp);
+
+				MoveToTarget (Draw ());
+				UpdateDrawPile ();
+
+			}
+		}
+
+		foreach (CardProspector tCP in tableau) {
+			foreach (int hid in tCP.slotDef.hiddenBy) {
+				cp = FindCardByLayoutID (hid);
+				tCP.hiddenBy.Add (cp);
+			}
+		}
+
+	}
+
+	CardProspector FindCardByLayoutID (int layoutID) {
+		foreach (CardProspector tCP in tableau) {
+			if (tCP.layoutID == layoutID) {
+				return (tCP);
+			}
+		}
+
+		return (null);
+	}
+
+	void SetTableauFaces () {
+		foreach (CardProspector cd in tableau) {
+			bool faceUp = true;
+			foreach (CardProspector cover in cd.hiddenBy) {
+				if (cover.state == eCardState.tableau) {
+					faceUp = false;
+				}
+			}
+			cd.faceUp = faceUp;
 		}
 	}
 
@@ -128,7 +165,7 @@ public class Prospector : MonoBehaviour {
 			cd.faceUp = false;
 			cd.state = eCardState.drawpile;
 
-			cd.SetSortingLayerName (layout.discardPile.layerName);
+			cd.SetSortingLayerName (layout.drawPile.layerName);
 			cd.SetSortOrder (-10 * i);
 
 		}
@@ -148,9 +185,37 @@ public class Prospector : MonoBehaviour {
 				break;
 
 			case eCardState.tableau:
+				bool validMatch = true;
+				if (!cd.faceUp) {
+					validMatch = false;
+				}
+				if(!AdjacentRank (cd, target)) {
+					validMatch = false;
+				}
+				if (!validMatch) return;
+
+				tableau.Remove (cd);
+				MoveToTarget (cd);
+				SetTableauFaces ();
+
 				break;
 
 		}
+
+	}
+
+	public bool AdjacentRank (CardProspector c0, CardProspector c1) {
+
+		if (!c0.faceUp || !c1.faceUp) return (false);
+
+		if (Mathf.Abs (c0.rank - c1.rank) == 1) {
+			return (true);
+		}
+
+		if (c0.rank == 1 && c1.rank == 13) return (true);
+		if (c0.rank == 13 && c1.rank == 1) return (true);
+
+		return (false);
 
 	}
 
