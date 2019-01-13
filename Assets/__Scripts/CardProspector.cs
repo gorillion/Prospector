@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 public enum eCardState {
 	drawpile,
 	tableau,
@@ -21,25 +16,7 @@ public class CardProspector : Card {
 	public int layoutID;
 	public SlotDef slotDef;
 
-	public override void OnMouseUpAsButton () {
-		Prospector.S.CardClicked (this);
-		base.OnMouseUpAsButton ();
-	}
-
-	void Start() {
-=======
-=======
->>>>>>> parent of 5553b2b... layers + other progress
-=======
->>>>>>> parent of 5553b2b... layers + other progress
-=======
->>>>>>> parent of 5553b2b... layers + other progress
-=======
->>>>>>> parent of 5553b2b... layers + other progress
-public class CardProspector : MonoBehaviour {
-    
     void Start() {
->>>>>>> parent of 5553b2b... layers + other progress
         
     }
 
