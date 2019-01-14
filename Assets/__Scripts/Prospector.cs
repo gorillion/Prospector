@@ -86,11 +86,14 @@ public class Prospector : MonoBehaviour {
 
 				tableau.Add (cp);
 
-				MoveToTarget (Draw ());
-				UpdateDrawPile ();
+				//MoveToTarget (Draw ());
+				//UpdateDrawPile ();
 
 			}
 		}
+
+		MoveToTarget (Draw ());
+		UpdateDrawPile ();
 
 		foreach (CardProspector tCP in tableau) {
 			foreach (int hid in tCP.slotDef.hiddenBy) {
