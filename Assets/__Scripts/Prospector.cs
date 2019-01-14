@@ -204,7 +204,36 @@ public class Prospector : MonoBehaviour {
 				break;
 
 		}
+		CheckForGameOver();
 
+	}
+
+	void CheckForGameOver () {
+		if (tableau.Count == 0) {
+			GameOver(true);
+			return;
+		}
+		if (drawPile.Count > 0) {
+			return;
+		}
+
+		foreach(CardProspector cd in tableau) {
+			if (AdjacentRank(cd, target)) {
+				return;
+			}
+		}
+
+		GameOver(false); 
+	}
+
+	void GameOver (bool won) {
+		if (won) {
+			print("u win");
+		} else {
+			print("u lose");
+		}
+
+		SceneManager.LoadScene("__Prospector_Scene_0");
 	}
 
 	public bool AdjacentRank (CardProspector c0, CardProspector c1) {
